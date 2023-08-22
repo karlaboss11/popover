@@ -1,45 +1,45 @@
 import {
+  AfterViewInit,
   Component,
+  Directive,
   ElementRef,
   EventEmitter,
   Inject,
   Input,
-  ViewChild,
-  ViewEncapsulation,
-  TemplateRef,
   OnInit,
   Optional,
   Output,
-  Directive,
+  TemplateRef,
+  ViewChild,
   ViewContainerRef,
-  AfterViewInit
+  ViewEncapsulation
 } from '@angular/core';
-import { AnimationEvent } from '@angular/animations';
-import { DOCUMENT } from '@angular/common';
-import { ConfigurableFocusTrap, ConfigurableFocusTrapFactory, FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
-import { BooleanInput, coerceBooleanProperty, coerceNumberProperty, NumberInput } from '@angular/cdk/coercion';
+import {AnimationEvent} from '@angular/animations';
+import {DOCUMENT} from '@angular/common';
+import {ConfigurableFocusTrap, ConfigurableFocusTrapFactory} from '@angular/cdk/a11y';
+import {BooleanInput, coerceBooleanProperty, coerceNumberProperty, NumberInput} from '@angular/cdk/coercion';
 
-import { transformPopover } from './popover.animations';
+import {transformPopover} from './popover.animations';
 import {
-  getUnanchoredPopoverError,
   getInvalidHorizontalAlignError,
-  getInvalidVerticalAlignError,
-  getInvalidScrollStrategyError,
   getInvalidPopoverAnchorError,
+  getInvalidPopoverError,
   getInvalidSatPopoverAnchorError,
-  getInvalidPopoverError
+  getInvalidScrollStrategyError,
+  getInvalidVerticalAlignError,
+  getUnanchoredPopoverError
 } from './popover.errors';
 import {
-  SatPopoverScrollStrategy,
   SatPopoverHorizontalAlign,
+  SatPopoverOpenOptions,
+  SatPopoverScrollStrategy,
   SatPopoverVerticalAlign,
-  VALID_SCROLL,
   VALID_HORIZ_ALIGN,
-  VALID_VERT_ALIGN,
-  SatPopoverOpenOptions
+  VALID_SCROLL,
+  VALID_VERT_ALIGN
 } from './types';
-import { SatPopoverAnchoringService } from './popover-anchoring.service';
-import { DEFAULT_TRANSITION } from './tokens';
+import {SatPopoverAnchoringService} from './popover-anchoring.service';
+import {DEFAULT_TRANSITION} from './tokens';
 
 const DEFAULT_OPEN_ANIMATION_START_SCALE = 0.3;
 const DEFAULT_CLOSE_ANIMATION_END_SCALE = 0.5;
@@ -53,6 +53,7 @@ export class SatPopoverAnchor implements AfterViewInit {
   get popover() {
     return this._popover;
   }
+
   set popover(val: SatPopover) {
     if (val instanceof SatPopover) {
       val.anchor = this;
@@ -68,7 +69,8 @@ export class SatPopoverAnchor implements AfterViewInit {
   /** @internal */
   _popover: SatPopover;
 
-  constructor(public elementRef: ElementRef, public viewContainerRef: ViewContainerRef) {}
+  constructor(public elementRef: ElementRef, public viewContainerRef: ViewContainerRef) {
+  }
 
   ngAfterViewInit() {
     if (!this.popover) {
@@ -91,6 +93,7 @@ export class SatPopover implements OnInit {
   get anchor() {
     return this._anchor;
   }
+
   set anchor(val: SatPopoverAnchor | ElementRef<HTMLElement> | HTMLElement) {
     if (val instanceof SatPopoverAnchor) {
       val._popover = this;
@@ -103,6 +106,7 @@ export class SatPopover implements OnInit {
       throw getInvalidPopoverAnchorError();
     }
   }
+
   private _anchor: SatPopoverAnchor | ElementRef<HTMLElement> | HTMLElement;
 
   /** Alignment of the popover on the horizontal axis. */
@@ -110,6 +114,7 @@ export class SatPopover implements OnInit {
   get horizontalAlign() {
     return this._horizontalAlign;
   }
+
   set horizontalAlign(val: SatPopoverHorizontalAlign) {
     this._validateHorizontalAlign(val);
     if (this._horizontalAlign !== val) {
@@ -117,6 +122,7 @@ export class SatPopover implements OnInit {
       this._anchoringService.repositionPopover();
     }
   }
+
   private _horizontalAlign: SatPopoverHorizontalAlign = 'center';
 
   /** Alignment of the popover on the x axis. Alias for `horizontalAlign`. */
@@ -124,6 +130,7 @@ export class SatPopover implements OnInit {
   get xAlign() {
     return this.horizontalAlign;
   }
+
   set xAlign(val: SatPopoverHorizontalAlign) {
     this.horizontalAlign = val;
   }
@@ -133,6 +140,7 @@ export class SatPopover implements OnInit {
   get verticalAlign() {
     return this._verticalAlign;
   }
+
   set verticalAlign(val: SatPopoverVerticalAlign) {
     this._validateVerticalAlign(val);
     if (this._verticalAlign !== val) {
@@ -140,6 +148,7 @@ export class SatPopover implements OnInit {
       this._anchoringService.repositionPopover();
     }
   }
+
   private _verticalAlign: SatPopoverVerticalAlign = 'center';
 
   /** Alignment of the popover on the y axis. Alias for `verticalAlign`. */
@@ -147,6 +156,7 @@ export class SatPopover implements OnInit {
   get yAlign() {
     return this.verticalAlign;
   }
+
   set yAlign(val: SatPopoverVerticalAlign) {
     this.verticalAlign = val;
   }
@@ -156,6 +166,7 @@ export class SatPopover implements OnInit {
   get forceAlignment() {
     return this._forceAlignment;
   }
+
   set forceAlignment(val: BooleanInput) {
     const coercedVal = coerceBooleanProperty(val);
     if (this._forceAlignment !== coercedVal) {
@@ -163,6 +174,7 @@ export class SatPopover implements OnInit {
       this._anchoringService.repositionPopover();
     }
   }
+
   private _forceAlignment = false;
 
   /**
@@ -173,6 +185,7 @@ export class SatPopover implements OnInit {
   get lockAlignment() {
     return this._lockAlignment;
   }
+
   set lockAlignment(val: BooleanInput) {
     const coercedVal = coerceBooleanProperty(val);
     if (this._lockAlignment !== coercedVal) {
@@ -180,6 +193,7 @@ export class SatPopover implements OnInit {
       this._anchoringService.repositionPopover();
     }
   }
+
   private _lockAlignment = false;
 
   /** Whether the first focusable element should be focused on open. */
@@ -187,9 +201,11 @@ export class SatPopover implements OnInit {
   get autoFocus() {
     return this._autoFocus && this._autoFocusOverride;
   }
+
   set autoFocus(val: BooleanInput) {
     this._autoFocus = coerceBooleanProperty(val);
   }
+
   private _autoFocus = true;
   _autoFocusOverride = true;
 
@@ -198,9 +214,11 @@ export class SatPopover implements OnInit {
   get restoreFocus() {
     return this._restoreFocus && this._restoreFocusOverride;
   }
+
   set restoreFocus(val: BooleanInput) {
     this._restoreFocus = coerceBooleanProperty(val);
   }
+
   private _restoreFocus = true;
   _restoreFocusOverride = true;
 
@@ -209,6 +227,7 @@ export class SatPopover implements OnInit {
   get scrollStrategy() {
     return this._scrollStrategy;
   }
+
   set scrollStrategy(val: SatPopoverScrollStrategy) {
     this._validateScrollStrategy(val);
     if (this._scrollStrategy !== val) {
@@ -216,6 +235,7 @@ export class SatPopover implements OnInit {
       this._anchoringService.updatePopoverConfig();
     }
   }
+
   private _scrollStrategy: SatPopoverScrollStrategy = 'reposition';
 
   /** Whether the popover should have a backdrop (includes closing on click). */
@@ -223,9 +243,11 @@ export class SatPopover implements OnInit {
   get hasBackdrop() {
     return this._hasBackdrop;
   }
+
   set hasBackdrop(val: BooleanInput) {
     this._hasBackdrop = coerceBooleanProperty(val);
   }
+
   private _hasBackdrop = false;
 
   /** Whether the popover should close when the user clicks the backdrop or presses ESC. */
@@ -233,9 +255,11 @@ export class SatPopover implements OnInit {
   get interactiveClose(): boolean {
     return this._interactiveClose;
   }
+
   set interactiveClose(val: BooleanInput) {
     this._interactiveClose = coerceBooleanProperty(val);
   }
+
   private _interactiveClose = true;
 
   /** Custom transition to use while opening. */
@@ -243,36 +267,42 @@ export class SatPopover implements OnInit {
   get openTransition() {
     return this._openTransition;
   }
+
   set openTransition(val: string) {
     if (val) {
       this._openTransition = val;
     }
   }
-  private _openTransition = this._defaultTransition;
+
+  private _openTransition: string;
 
   /** Custom transition to use while closing. */
   @Input()
   get closeTransition() {
     return this._closeTransition;
   }
+
   set closeTransition(val: string) {
     if (val) {
       this._closeTransition = val;
     }
   }
-  private _closeTransition = this._defaultTransition;
+
+  private _closeTransition: string;
 
   /** Scale value at the start of the :enter animation. */
   @Input()
   get openAnimationStartAtScale() {
     return this._openAnimationStartAtScale;
   }
+
   set openAnimationStartAtScale(val: NumberInput) {
     const coercedVal = coerceNumberProperty(val);
     if (!isNaN(coercedVal)) {
       this._openAnimationStartAtScale = coercedVal;
     }
   }
+
   private _openAnimationStartAtScale = DEFAULT_OPEN_ANIMATION_START_SCALE;
 
   /** Scale value at the end of the :leave animation */
@@ -280,12 +310,14 @@ export class SatPopover implements OnInit {
   get closeAnimationEndAtScale() {
     return this._closeAnimationEndAtScale;
   }
+
   set closeAnimationEndAtScale(val: NumberInput) {
     const coercedVal = coerceNumberProperty(val);
     if (!isNaN(coercedVal)) {
       this._closeAnimationEndAtScale = coercedVal;
     }
   }
+
   private _closeAnimationEndAtScale = DEFAULT_CLOSE_ANIMATION_END_SCALE;
 
   /** Optional backdrop class. */
@@ -313,7 +345,7 @@ export class SatPopover implements OnInit {
   @Output() overlayKeydown = new EventEmitter<KeyboardEvent>();
 
   /** Reference to template so it can be placed within a portal. */
-  @ViewChild(TemplateRef, { static: true }) _templateRef: TemplateRef<any>;
+  @ViewChild(TemplateRef, {static: true}) _templateRef: TemplateRef<any>;
 
   /** Classes to be added to the popover for setting the correct transform origin. */
   _classList: any = {};
@@ -346,6 +378,8 @@ export class SatPopover implements OnInit {
     // `@internal` stripping doesn't seem to work if the property is
     // declared inside the constructor
     this._anchoringService = _anchoringService;
+    this._closeTransition = _defaultTransition;
+    this._openTransition = _defaultTransition;
   }
 
   ngOnInit() {
@@ -392,6 +426,7 @@ export class SatPopover implements OnInit {
   get state() {
     return this._state;
   }
+
   get params() {
     return {
       openTransition: this.openTransition,
@@ -402,7 +437,7 @@ export class SatPopover implements OnInit {
   }
 
   /** Callback for when the popover is finished animating in or out. */
-  _onAnimationDone({ toState }: AnimationEvent) {
+  _onAnimationDone({toState}: AnimationEvent) {
     if (toState === 'enter') {
       this._trapFocus();
       this.afterOpen.emit();
@@ -416,6 +451,7 @@ export class SatPopover implements OnInit {
   _startExitAnimation(): void {
     this._state = 'exit';
   }
+
   /** Apply alignment classes based on alignment inputs. */
   _setAlignmentClasses(horizAlign = this.horizontalAlign, vertAlign = this.verticalAlign) {
     this._classList['sat-popover-before'] = horizAlign === 'before' || horizAlign === 'end';
